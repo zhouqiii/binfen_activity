@@ -4,19 +4,19 @@
           <!--头部筛选条件-->
           <div class="activity_select">
             <div class="activity_condition">
-              <el-form ref="form" :model="activity" label-width="1rem"
+              <el-form ref="form" :model="activity" label-width="100px"
                 class="form_select flex-row-start"
                 label-position="right"
                 size="mini"
               >
                 <el-form-item label="活动名称:" class="form_acname">
-                  <el-input v-model="activity.name" placeholder="请输入活动名称"></el-input>
+                  <el-input v-model="activity.activityName" placeholder="请输入活动名称"></el-input>
                 </el-form-item>
                 <el-form-item label="城市:" class="form_city">
-                  <el-input v-model="activity.city" placeholder="请输入城市"></el-input>
+                  <el-input v-model="activity.activityArea" placeholder="请输入城市"></el-input>
                 </el-form-item>
                 <el-form-item label="状态:" class="form_status">
-                  <el-select v-model="activity.status" placeholder="请选择">
+                  <el-select v-model="activity.activityStatus" placeholder="请选择">
                     <el-option
                       v-for="item in ActivityStatus"
                       :key="item.value"
@@ -25,10 +25,11 @@
                     </el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="活动起止时间:" class="form_time" label-width="1.6rem">
+                <el-form-item label="活动起止时间:" class="form_time">
                   <el-col :span="10">
                     <el-date-picker type="date" placeholder="选择日期"
-                      v-model="activity.startDate"
+                      v-model="activity.activityStartDt"
+                      value-format="yyyy-MM-dd"
                       style="width: 100%;"
                     >
                     </el-date-picker>
@@ -36,8 +37,9 @@
                   <el-col class="line" :span="2">~</el-col>
                   <el-col :span="10">
                     <el-date-picker type="date" placeholder="选择日期"
-                      v-model="activity.endDate"
+                      v-model="activity.activityEndDt"
                       style="width: 100%;"
+                      value-format="yyyy-MM-dd"
                     >
                     </el-date-picker>
                   </el-col>
@@ -46,7 +48,7 @@
             </div>
             <div class="activity_queryBtn">
               <el-button type="primary" class="query" size="mini"
-                @click="queryData()"
+                @click="getdataActivity('query')"
               >查询</el-button>
             </div>
             <div class="activity_addBtn">
@@ -120,14 +122,14 @@ export default {
   data() {
     return {
       activity: {
-        name: '',
-        city: '',
-        status: '',
-        startDate: '',
-        endDate: '',
+        activityName: '',
+        activityArea: '',
+        activityStatus: '',
+        activityStartDt: '',
+        activityEndDt: '',
       },
       tableData: [],
-      ActivityStatus: [{ label: '下架', value: 0 }, { label: '上架', value: 1 }],
+      ActivityStatus: [{ label: '全部', value: '' }, { label: '下架', value: '0' }, { label: '上架', value: '1' }],
       activityStatustext: '', // 上架/下架
       currentPage: 1, // 当前页
       pageSize: 10, // 每页多少条
@@ -138,37 +140,53 @@ export default {
   },
   methods: {
     // 获取表格数据
-    getdata() {
+    getdata(data) {
       this.loading = true;
       this.request({
-        url: '/mock/index.json',
-        data: {},
+        url: '/api/activityList.do',
+        data,
         params: {
           pageSize: this.pageSize,
           pageNum: this.currentPage,
         },
-        method: 'get',
+        method: 'post', // post
       }).then((res) => {
         this.loading = false;
         this.assignData(res);
-      }).catch((err) => {
+      }).catch(() => {
         this.loading = false;
-        this.$message.error({ message: err.message });
       });
     },
-    // 拿到数据后处理给表格赋值
-    assignData(res) {
-      if (res.data.total > 0) {
-        this.total = res.data.total;
-        this.totalPage = res.data.totalPage;
+    // 查询和分页时上送参数转成FormData
+    getdataActivity(val) {
+      if (val === 'query') {
+        this.currentPage = 1;
       }
-      if (res.list) {
-        console.log(res.list);
-        this.tableData = res.list;
+      const formData = new FormData();
+      const data = this.activity;
+      data.activityStartDt = data.activityStartDt === null ? '' : data.activityStartDt;
+      data.activityEndDt = data.activityEndDt === null ? '' : data.activityEndDt;
+      Object.keys(data).forEach((item) => {
+        formData.append(item, data[item]);
+      });
+      this.getdata(formData);
+    },
+    // 拿到数据后处理给表格赋值
+    assignData(val) {
+      const res = JSON.parse(val);
+      if (res.body.total >= 0) {
+        this.total = res.body.total;
+        this.totalPage = Math.ceil(res.body.total / res.body.pageSize);
+        if (this.totalPage === 0) {
+          this.totalPage = 1;
+        }
+      }
+      if (res.body.list) {
+        this.tableData = res.body.list;
         this.tableData.forEach((item) => {
           const data = item;
-          data.activityDt = `${data.activityStartDt.split(' ')[0]}~${data.activityEndDt.split(' ')[0]}`;
-          data.getTicketDt = `${data.getTicketStartDt.split(' ')[0]}~${data.getTicketEndDt.split(' ')[0]}`;
+          data.activityDt = `${data.activityStartDt}~${data.activityEndDt}`;
+          data.getTicketDt = `${data.getTicketStartDt}~${data.getTicketEndDt}`;
           if (data.activityStatus === '0') {
             data.activityStatus = false;
             data.statusText = '下架';
@@ -181,20 +199,6 @@ export default {
       } else {
         this.tableData = [];
       }
-    },
-    // 查询
-    queryData() {
-      console.log(this.activity.status);
-      let startTime = '';// 活动开始时间
-      let endTime = '';// 活动结束时间
-      if (this.activity.startDate) {
-        startTime = `${this.activity.startDate} 00:00:00`;
-      }
-      if (this.activity.endDate) {
-        endTime = `${this.activity.endDate} 00:00:00`;
-      }
-      console.log(startTime, endTime);
-      this.getdata();
     },
     // 去配置页面
     routeItem(path, val) {
@@ -212,25 +216,47 @@ export default {
     // 表格里上下架切换
     getStatusThis(val) {
       const row = val;
-      if (row.status) {
-        row.statusText = '上架';
-      } else {
-        row.statusText = '下架';
-      }
+      this.loading = true;
+      const status = row.activityStatus ? '1' : '0';
+      const formData = new FormData();
+      formData.append('activityId', row.activityId);
+      formData.append('activityStatus', status);
+      this.request({
+        url: '/api/update.do',
+        data: formData,
+        params: {},
+        method: 'post', // post
+      }).then((value) => {
+        this.loading = false;
+        const res = JSON.parse(value);
+        if (res.stat === '00') {
+          this.$message.success({ message: '修改成功！' });
+          row.statusText = row.activityStatus ? '上架' : '下架';
+        } else {
+          row.activityStatus = !row.activityStatus;
+          row.statusText = row.activityStatus ? '上架' : '下架';
+          this.$message.error({ message: '修改失败,请重试！' });
+        }
+      }).catch(() => {
+        this.loading = false;
+        row.activityStatus = !row.activityStatus;
+        row.statusText = row.activityStatus ? '上架' : '下架';
+        return row;
+      });
     },
     // 每页条数pageSize改变时触发
     handleSizeChange(val) {
       this.pageSize = val;
-      this.getdata();
+      this.getdataActivity();
     },
     // currentPage当前页改变时会触发
     handleCurrentChange(val) {
       this.currentPage = val;
-      this.getdata();
+      this.getdataActivity();
     },
   },
   mounted() {
-    this.getdata();
+    this.getdata({});
   },
 };
 </script>

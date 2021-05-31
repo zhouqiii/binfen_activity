@@ -6,13 +6,16 @@ import Vue from 'vue';
 // } from '@/utils/commonFn';
 
 export const req = axios.create({
-  baseURL: process.env.NODE_ENV === 'development' ? ' ' : '/AppPrj',
+  baseURL: process.env.NODE_ENV === 'development' ? '' : '/AppPrj',
   timeout: 15000,
   //   params: {
   //     txnId: `${isMobile()}CODE00001`,
   //     imei: getParamsFromUrl('imei') || '123',
   //     dns: process.env.NODE_ENV === 'development' ? '322' : '322', // 生产环境要改
   //   },
+  // headers: {
+  //   'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+  // },
   withCredentials: true,
 });
 export const request = ({
@@ -24,7 +27,11 @@ export const request = ({
   method,
 });
 
-req.interceptors.request.use((config) => config, (err) => {
+req.interceptors.request.use((config) => {
+  const configThe = config;
+  configThe.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+  return configThe;
+}, (err) => {
   console.log(err);
 });
 req.interceptors.response.use((res) => {
