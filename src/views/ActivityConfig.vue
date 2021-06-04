@@ -10,10 +10,9 @@
               size="mini"
               :rules="rules"
             >
-              <el-form-item label="活动名称:"  prop="activityName">
+              <el-form-item label="活动名称:" prop="activityName">
                 <el-input v-model="form.activityName"
                   style="width:100%"
-                  @blur="checkInput(form.activityName,'活动名称')"
                 >
                 </el-input>
               </el-form-item>
@@ -24,7 +23,6 @@
                     style="width: 100%;"
                     :disabled="disabledTime"
                     value-format="yyyy-MM-dd"
-                    @blur="checkInput(form.activityStartDt,'活动开始时间')"
                   >
                   </el-date-picker>
                 </el-form-item>
@@ -33,7 +31,6 @@
                     v-model="form.activityEndDt"
                     style="width: 100%;"
                     value-format="yyyy-MM-dd"
-                    @blur="checkInput(form.activityEndDt,'活动结束时间')"
                   >
                   </el-date-picker>
                 </el-form-item>
@@ -45,7 +42,6 @@
                       style="width: 100%;"
                       :disabled="disabledTime"
                       value-format="yyyy-MM-dd"
-                      @blur="checkInput(form.getTicketStartDt,'可领劵开始时间')"
                   >
                   </el-date-picker>
                 </el-form-item>
@@ -54,7 +50,6 @@
                     v-model="form.getTicketEndDt"
                     style="width: 100%;"
                     value-format="yyyy-MM-dd"
-                    @blur="checkInput(form.getTicketEndDt,'可领劵结束时间')"
                   >
                   </el-date-picker>
                 </el-form-item>
@@ -94,7 +89,6 @@
                 <template slot-scope="scope">
                   <el-input v-model="scope.row.ruleNum" style="width:60%"
                     size="mini"
-                    @blur="checkNum(scope.row.ruleNum)"
                   ></el-input>
                   <span style="margin-left:.1rem">次</span>
                 </template>
@@ -138,12 +132,6 @@
             >
               <el-form-item label="活动规则描述:" prop="activityRuleDesp">
                 <el-input :rows="4" type="textarea" v-model="form.activityRuleDesp"
-                  @blur="checkInput(form.activityRuleDesp,'活动规则描述')"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="使用及注意事项:" prop="activityNotice">
-                <el-input :rows="4" type="textarea" v-model="form.activityNotice"
-                  @blur="checkInput(form.activityNotice,'使用及注意事项')"
                 ></el-input>
               </el-form-item>
             </el-form>
@@ -195,13 +183,12 @@ export default {
         activityBusDesp: '', //
         activitySubDesp: '',
         activityRuleDesp: '',
-        activityNotice: '',
         activityId: '',
       },
       disabledTime: false,
       disabledRule: true,
       collectionRuleTable: [{ ruleType: '0', ruleNum: '' }],
-      timeStatus: [{ label: '整个期间', value: '0' }, { label: '每周', value: '1' }, { label: '每月', value: '2' }],
+      timeStatus: [{ label: '整个期间', value: '0' }, { label: '每周', value: '1' }, { label: '每天', value: '2' }],
       rules: {
         activityName: [{ required: true, message: ' ', trigger: 'blur' }],
         activityStartDt: [{ required: true, message: ' ', trigger: 'blur' }],
@@ -209,7 +196,6 @@ export default {
         getTicketStartDt: [{ required: true, message: ' ', trigger: 'blur' }],
         getTicketEndDt: [{ required: true, message: ' ', trigger: 'blur' }],
         activityRuleDesp: [{ required: true, message: ' ', trigger: 'blur' }],
-        activityNotice: [{ required: true, message: ' ', trigger: 'blur' }],
         status: [{ required: true, trigger: 'blur' }],
       },
       loading: false,
@@ -248,33 +234,25 @@ export default {
         this.disabledRule = true;
       }
     },
-    // 必填的输入框失焦事件
-    checkInput(val, msg) {
-      if (!val) {
-        this.$message({ message: `${msg}不可为空!` });
-      }
-    },
-    // 领取规则失焦校验
-    checkNum(val) {
-      const num = /^\+?[1-9][0-9]*$/;
-      const number = parseInt(val, 10);
-      if (!val) {
-        this.$message({ message: '数量不可为空!' });
-      } else if (!num.test(number)) {
-        this.$message({ message: '数量只能为数字!' });
-      }
+    formatDate(val) {
+      const year = val.getFullYear();
+      const month = parseInt(val.getMonth() + 1, 10) < 10 ? `0${val.getMonth() + 1}` : val.getMonth() + 1;
+      const day = parseInt(val.getDate(), 10) < 10 ? `0${val.getDate()}` : val.getDate();
+      return `${year}-${month}-${day}`;
     },
     // 保存该活动
     saveActivity() {
       let flag = true;
+      const num = /^[1-9]*$/;
       this.loading = true;
       const data = this.form;
       const list = this.collectionRuleTable;
       const formData = new FormData();
+      let count = 0;
       Object.keys(data).forEach((item) => {
         formData.append(item, data[item]);
         if (item !== 'activityBusDesp' && item !== 'activitySubDesp' && item !== 'activityId') {
-          if (!data[item]) {
+          if (!data[item] || data[item].toString().split(' ').join('').length === 0) {
             flag = false;
           }
         }
@@ -284,19 +262,48 @@ export default {
         formData.append(`activityList[${i}].ruleNum`, list[i].ruleNum);
         if (!list[i].ruleNum) {
           flag = false;
+        } else if (!num.test(list[i].ruleNum)) {
+          flag = false;
         }
+      }
+      if ([...new Set(list.map((item) => item.ruleType))].length < list.length) {
+        count = 1;
+        flag = false;
       }
       if (flag) {
         this.sendSaveData(formData);
       } else {
         this.loading = false;
-        this.$message({ message: '有必填项暂未填写,请补充后重新保存！' });
+        if (!data.activityName || data.activityName.toString().split(' ').join('').length === 0) {
+          this.$message({ message: '活动名称不可为空!' });
+        } else if (!data.activityStartDt || data.activityStartDt.toString().split(' ').join('').length === 0) {
+          this.$message({ message: '活动开始时间不可为空!' });
+        } else if (!data.activityEndDt || data.activityEndDt.toString().split(' ').join('').length === 0) {
+          this.$message({ message: '活动结束时间不可为空!' });
+        } else if (!data.getTicketStartDt || data.getTicketStartDt.toString().split(' ').join('').length === 0) {
+          this.$message({ message: '可领劵开始时间不可为空!' });
+        } else if (!data.getTicketEndDt || data.getTicketEndDt.toString().split(' ').join('').length === 0) {
+          this.$message({ message: '可领劵结束时间不可为空!' });
+        } else if (!data.activityRuleDesp || data.activityRuleDesp.toString().split(' ').join('').length === 0) {
+          this.$message({ message: '活动规则描述不可为空!' });
+        } else if (count === 1) {
+          this.$message({ message: '领取规则时间不能重复！' });
+        } else {
+          for (let j = 0; j < list.length; j++) {
+            if (!list[j].ruleNum) {
+              this.$message({ message: '领取规则数量不可为空!' });
+              break;
+            } else if (!num.test(list[j].ruleNum)) {
+              this.$message({ message: '领取规则数量只能为非零整数!' });
+              break;
+            }
+          }
+        }
       }
     },
     sendSaveData(formData) {
-      this.loading = false;
       this.request({
-        url: '/api/add.do',
+        url: '/add.do',
         data: formData,
         params: {},
         method: 'post',
@@ -306,6 +313,7 @@ export default {
           const res = JSON.parse(val);
           if (res.stat === '00') {
             this.$message({ message: '保存成功!', type: 'success' });
+            this.$router.push({ path: '/' });
           } else if (res.result) {
             this.$message.error({ message: res.result });
           } else {
@@ -322,6 +330,9 @@ export default {
     if (this.$route.query.data) {
       data = JSON.parse(this.$route.query.data);
       this.assignData(data);
+    } else {
+      this.form.activityStartDt = this.formatDate(new Date());
+      this.form.getTicketStartDt = this.formatDate(new Date());
     }
   },
 };

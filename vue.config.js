@@ -47,12 +47,12 @@ module.exports = {
   },
   devServer: {
     proxy: {
-      '/api': {
+      '/': {
         target: 'http://22.11.236.69:8080/mlifeWeb/activity',
         changeOrigin: true,
         ws: true,
         pathRewrite: {
-          '^/api': '',
+          '^/': '',
         },
       },
     },

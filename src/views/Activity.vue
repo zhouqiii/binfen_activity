@@ -143,7 +143,7 @@ export default {
     getdata(data) {
       this.loading = true;
       this.request({
-        url: '/api/activityList.do',
+        url: '/activityList.do',
         data,
         params: {
           pageSize: this.pageSize,
@@ -222,7 +222,7 @@ export default {
       formData.append('activityId', row.activityId);
       formData.append('activityStatus', status);
       this.request({
-        url: '/api/update.do',
+        url: '/update.do',
         data: formData,
         params: {},
         method: 'post', // post

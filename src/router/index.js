@@ -1,13 +1,14 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import Activity from '../views/Activity.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/Activity',
-    name: 'Activity',
-    component: () => import(/* webpackChunkName: "activity" */ '../views/Activity.vue'),
+    path: '/',
+    name: Activity,
+    component: Activity,
   }, {
     path: '/ActivityConfig',
     name: 'ActivityConfig',
