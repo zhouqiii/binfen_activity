@@ -14,6 +14,11 @@ const routes = [
     name: 'ActivityConfig',
     component: () => import(/* webpackChunkName: "activityconfiguration" */ '../views/ActivityConfig.vue'),
   },
+  {
+    path: '/Test',
+    name: 'Test',
+    component: () => import(/* webpackChunkName: "activityconfiguration" */ '../views/Test.vue'),
+  },
 ];
 
 const router = new VueRouter({

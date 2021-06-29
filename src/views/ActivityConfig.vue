@@ -75,7 +75,9 @@
             >
               <el-table-column prop="ruleType" label="时间">
                 <template slot-scope="scope">
-                  <el-select v-model="scope.row.ruleType" size="mini">
+                  <el-select v-model="scope.row.ruleType" size="mini"
+                    @change="selectTrigger(scope)"
+                  >
                     <el-option
                       v-for="item in timeStatus"
                       :key="item.value"
@@ -89,6 +91,7 @@
                 <template slot-scope="scope">
                   <el-input v-model="scope.row.ruleNum" style="width:60%"
                     size="mini"
+                    :disabled="scope.row.ruleType==='0'"
                   ></el-input>
                   <span style="margin-left:.1rem">次</span>
                 </template>
@@ -187,8 +190,8 @@ export default {
       },
       disabledTime: false,
       disabledRule: true,
-      collectionRuleTable: [{ ruleType: '0', ruleNum: '' }],
-      timeStatus: [{ label: '整个期间', value: '0' }, { label: '每周', value: '1' }, { label: '每天', value: '2' }],
+      collectionRuleTable: [{ ruleType: '2', ruleNum: '' }],
+      timeStatus: [{ label: '整个期间', value: '2' }, { label: '每周', value: '1' }, { label: '每天', value: '0' }],
       rules: {
         activityName: [{ required: true, message: ' ', trigger: 'blur' }],
         activityStartDt: [{ required: true, message: ' ', trigger: 'blur' }],
@@ -221,11 +224,17 @@ export default {
           duration: 1500,
         });
       } else {
-        this.collectionRuleTable.push({ ruleType: '0', ruleNum: '' });
+        this.collectionRuleTable.push({ ruleType: '2', ruleNum: '' });
         if (this.collectionRuleTable.length >= 2) {
           this.disabledRule = false;
         }
       }
+    },
+    // 领取规则select切换事件
+    selectTrigger(scope) {
+      const item = scope;
+      item.row.ruleNum = item.row.ruleType === '0' ? '1' : '';
+      return item;
     },
     // 删除当前领取规则按钮
     deleteRule(index) {
