@@ -56,6 +56,11 @@
                 新建活动
               </el-button>
             </div>
+            <div class="activity_addBtn">
+              <el-button type="primary" size="mini" @click="toTinymce">
+                Test富文本编辑器Tinymce
+              </el-button>
+            </div>
           </div>
           <!--表格-->
           <div class="activity_table">
@@ -253,6 +258,9 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val;
       this.getdataActivity();
+    },
+    toTinymce() {
+      this.$router.push({ path: '/TinymceText' });
     },
   },
   mounted() {

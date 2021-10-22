@@ -15,9 +15,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "activityconfiguration" */ '../views/ActivityConfig.vue'),
   },
   {
-    path: '/Test',
-    name: 'Test',
-    component: () => import(/* webpackChunkName: "activityconfiguration" */ '../views/Test.vue'),
+    path: '/TinymceText',
+    name: 'TinymceText',
+    component: () => import(/* webpackChunkName: "activityconfiguration" */ '../views/TinymceText.vue'),
   },
 ];
 
