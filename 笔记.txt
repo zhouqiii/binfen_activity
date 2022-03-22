@@ -1,0 +1,88 @@
+vue项目使用iframe，现有vue-friendly-iframe插件，demo：https://officert.github.io/vue-friendly-iframe/#/examples
+
+1.iframe在vue项目中的应用场景？
+2.vue组件引入iframe？
+3.vue如何获取iframe对象以及iframe内部的window对象？
+4.vue如何向iframe内部传送信息？
+5.iframe如何向外部发送信息？
+
+1.iframe使用的主要目的就是不改变浏览器url的前提下而在一个页面里嵌入另一个页面
+(1)需要接入三方的页面时
+(2)比如需要打开一个完整页面时：编辑器这些
+(3)两个页面js/css完全不相关
+2.使用方法：
+通过src属性就引入了要加载的页面内容
+<iframe src="/index.html">
+	<span>这里是不支持iframe标签的浏览器加载iframe时出现的内容</span>
+</iframe>
+3.
+<div>
+  <iframe :src="iframeSrc" ref="iframe"></iframe>
+</div>
+
+拿到iframe对象：
+	this.$refs.iframe
+拿到iframe内部的window对象，只有拿到这个对象才能向iframe内部传送数据：
+	this.$refs.iframe.contentWindow
+//
+<script>
+  export default{
+    data() {
+      return{
+        iframeSrc: '/index.html',
+        iframeObj: {}
+      }
+    },
+    mounted() {
+      this.iframeObj = this.$refs.iframe.contentWindow
+    }
+  }
+</script>
+4.vue向iframe内部传送数据利用postMessage
+	(同时iframe页面内部要监听拿到的message，在监听函数里对拿到的数据进行逻辑处理)：
+	//比如点击某个按钮触发sendMessage函数向iframe内部传送数据
+	sendMessage() {
+        this.iframeObj.postMessage({
+          cmd: 'sendName',//cmd用来区分这条message的目的
+          params: {
+            key1: 'value1',
+            key2: 'value2'
+          }
+        }, '*')
+      }
+	// iframe内部对message的处理：iframe页面里的代码
+	window.addEventListener('message', function(event) {
+        const data = event.data
+        switch(data.cmd) {
+          case 'sendName':
+            //函数处理逻辑
+            break;
+        }
+      })
+5.iframe向外部页面传送数据，父页面接收后处理：
+	//iframe内部触发的向父页面传送数据代码逻辑：
+	window.parent.postMessage({
+        cmd: 'returnHeight',
+        params: {
+          success: true,
+          data: document.body.scrollHeight + 'px'
+        }
+      }, '*')
+	//同时父页面即vue组件内部也要监听收到iframe传来的数据时进行的数据处理逻辑
+	methods: {
+      handleMessage (event) {
+        const data = event.data// 根据上面制定的结构来解析iframe内部发回来的数据
+        switch (data.cmd) {
+          case 'returnHeight':
+            // 业务逻辑
+            break
+          case 'returnWidth':
+            // 业务逻辑
+            break
+        }
+      }
+    },
+    mounted() {
+      window.addEventListener('message', this.handleMessage)
+    }
+	

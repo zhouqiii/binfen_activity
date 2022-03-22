@@ -19,6 +19,11 @@ const routes = [
     name: 'TinymceText',
     component: () => import(/* webpackChunkName: "activityconfiguration" */ '../views/TinymceText.vue'),
   },
+  {
+    path: '/iframe',
+    name: 'iframe',
+    component: () => import(/* webpackChunkName: "iframe" */ '../views/Iframe.vue'),
+  },
 ];
 
 const router = new VueRouter({

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title>test iframe</title>
+    <script>
+      // iframe内部对message的处理：iframe页面里的代码
+      window.addEventListener('message', function(event) {
+        var data = event.data
+        switch(data.cmd) {
+          case 'sendName':
+            //函数处理逻辑
+            document.getElementById('count').innerText = data.params.count
+            break;
+        }
+      })
+      //iframe向外部页面传送数据
+      function returnHeight() {
+        window.parent.postMessage({
+          cmd: 'returnHeight',
+          params: {
+            success: true,
+            height: document.body.scrollHeight + 'px'
+          }
+        }, '*')
+      }
+	</script>
+  </head>
+  <body>
+    <div class="iframe">
+      <div id="count">0</div>
+      <button type="submit" onclick="returnHeight()">触发iframe向外部组件传值</button>
+    </div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
