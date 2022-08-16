@@ -68,8 +68,8 @@ export default {
       console.log(file);
     },
     myUpload(content) {
-      console.log(content,'1111111')
-    }
+      console.log(content, '1111111');
+    },
   },
   mounted() {
   },
