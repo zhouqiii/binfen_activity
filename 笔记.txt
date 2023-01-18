@@ -85,4 +85,13 @@ vue项目使用iframe，现有vue-friendly-iframe插件，demo：https://officer
     mounted() {
       window.addEventListener('message', this.handleMessage)
     }
+  6.一般需要测试的功能
+  (1)挂载组件
+  (2)操作组件
+  (3)自定义事件
+  (4)全局挂载与卸载:使用在Vue-Router和Vuex
+  (5)模拟函数
+  (6)异步函数
+  (7)匹配器
+
 	
