@@ -24,6 +24,11 @@ const routes = [
     name: 'iframe',
     component: () => import(/* webpackChunkName: "iframe" */ '../views/Iframe.vue'),
   },
+  {
+    path: '/test-compare',
+    name: 'test-compare',
+    component: () => import(/* webpackChunkName: "test" */ '../views/test-compare.vue'),
+  },
 ];
 
 const router = new VueRouter({

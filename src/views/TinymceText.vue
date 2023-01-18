@@ -1,6 +1,11 @@
 <template>
   <div>
-    <tinymce></tinymce>
+    <tinymce
+      @setContent="setContent"
+      @myAddToolFun="myAddToolFun"
+      :reportContent="initContent"
+      ref="tinymce"
+    ></tinymce>
     <div>
       <el-button type="primary" @click="dialogVisible = true">上传图片</el-button>
       <el-dialog
@@ -39,12 +44,29 @@
           <el-button type="primary" @click="handleClose">上 传</el-button>
         </span>
       </el-dialog>
+      <el-dialog
+        :visible.sync="dialogTime"
+        width="30%"
+        :destroy-on-close="true"
+      >
+      <el-date-picker type="date" placeholder="选择日期"
+            v-model="startDate"
+            style="width: 100%;"
+            value-format="yyyy-MM-dd"
+          >
+          </el-date-picker>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogTime = false">取 消</el-button>
+          <el-button type="primary" @click="addTime">确定</el-button>
+        </span>
+    </el-dialog>
     </div>
   </div>
 </template>
 <script>
 import Tinymce from '../components/ActivityComponents/Tinymce.vue';
 
+let count = 1;
 export default {
   name: 'TinymceText',
   components: {
@@ -52,7 +74,11 @@ export default {
   },
   data() {
     return {
+      initContent: '<p>一个content的初始copy，与content区分开</p>',
+      content: '', // 父组件获取到的tinymce里面的内容
       fileList: [],
+      dialogTime: false,
+      startDate: '',
       dialogImageUrl: '',
       dialogVisible: false,
       disabled: false,
@@ -60,7 +86,6 @@ export default {
   },
   methods: {
     handleClose() {
-      alert(1);
       console.log(this.fileList, '1111');
       this.dialogVisible = false;
     },
@@ -68,7 +93,22 @@ export default {
       console.log(file);
     },
     myUpload(content) {
-      console.log(content, '1111111');
+      console.log(content, '22222');
+    },
+    myAddToolFun() {
+      // 在这里定义工具栏添加的自定义按钮的功能
+      this.dialogTime = true;
+    },
+    addTime() {
+      count += 1;
+      // 添加时间-&nbsp解决删除整个时间时总会往前多删一格；加一个空白span解决在插入时间后在插入时间，时间嵌套问题
+      const html = `&nbsp<span id="startDate-${count}" style="z-index: 1">${this.startDate}</span>
+      <span contenteditable='${false}' style="z-index: 99;width: 6px;display: inline-block;margin-left: -4px;height: 20px"></span>`;
+      this.$refs.tinymce.addHTML(html);
+      this.dialogTime = false;
+    },
+    setContent(val) {
+      this.content = val;
     },
   },
   mounted() {
