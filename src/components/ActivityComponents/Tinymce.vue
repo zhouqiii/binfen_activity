@@ -55,7 +55,7 @@ export default {
         readonly: false,
         skin_url: '/tinymce/skins/ui/oxide',
         height: this.height,
-        /* tinymce 通过添加扩展插件 plugins 的方式来添加功能 image时上传图片 link是超链接 配上上面import引入插件 */
+        /* tinymce 通过添加扩展插件 plugins 的方式来添加功能 image时上传图片 aoturesize可自动适配高度，有aoturesize时，height失效 link是超链接 配上上面import引入插件 */
         plugins: 'link lists image code table wordcount template media fullscreen preview paste',
         toolbar: 'bold italic underline strikethrough | fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat | addToolbar',
         branding: false,
