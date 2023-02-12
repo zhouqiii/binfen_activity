@@ -77,17 +77,28 @@ export default {
           editor.on('Change NodeChange KeyUp SetContent', () => {
             this.$emit('setContent', editor.getContent());
           });
-          editor.on('KeyDown', () => {
+          editor.on('KeyDown', (e) => {
             const id = 'id';
             const parentNode = 'parentNode';
             const iframe = document.querySelector('iframe');
             const iframeDoc = iframe.contentWindow.document;
             const addIdFlag = tinymce.activeEditor.selection.getSel().focusNode[parentNode][id];
+            let uselessNode = document.createElement('span')
+            uselessNode.innerHTML = '&nbsp;'
             if (addIdFlag) {
               if (addIdFlag.indexOf('startDate') > -1) {
-                const get = iframeDoc.getElementById(addIdFlag);
-                if (get) {
-                  get.remove();
+                if(e.keyCode === 8){//键盘的Back键
+                  const get = iframeDoc.getElementById(addIdFlag);
+                  const theParentNode = get.parentNode
+                  theParentNode.insertBefore(uselessNode, get)// &nbsp解决删除整个插入的dom时总会往前删一个字符问题
+                  if (get) {
+                    get.remove();
+                    setTimeout(() => {
+                      uselessNode.remove()
+                    }, 100)
+                  }
+                }else{//在插入的节点上输入键盘的其他键输入时，不处理
+                  return e.preventDefault()
                 }
               }
             }
@@ -110,7 +121,13 @@ export default {
       let divNode = null;
       divNode = document.createElement('span');
       divNode.innerHTML = `${html}`;
-      range.insertNode(divNode);
+      if(ifText){
+        tinymce.activeEditor.execCommand('mceInsertContent', false, html)
+      }else{
+        range.insertNode(divNode);
+      }
+      tinymce.activeEditor.selection.collapse()// 关闭插入内容后将内容选中
+      this.$emit('setContent', tiny.getContent())
     },
     setContent(value) {
       tinymce.get(this.tinymceId).setContent(value);

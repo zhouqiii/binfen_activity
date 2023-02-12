@@ -8,6 +8,7 @@
     ></tinymce>
     <div>
       <el-button type="primary" @click="dialogVisible = true">上传图片</el-button>
+      <el-button type="primary" @click="addText">插入纯文本</el-button>
       <el-dialog
         :visible.sync="dialogVisible"
         width="30%"
@@ -98,6 +99,9 @@ export default {
     myAddToolFun() {
       // 在这里定义工具栏添加的自定义按钮的功能
       this.dialogTime = true;
+    },
+    addText(){
+      this.$refs.tinymce.addHTML('插入文字', true);
     },
     addTime() {
       count += 1;
