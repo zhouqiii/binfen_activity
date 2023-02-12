@@ -31,7 +31,7 @@
         data: {
             deep: true,
             handler(val){
-                this.updateChart()
+                this.initchart()
             }
         }
     },
@@ -50,6 +50,7 @@
                 this.chart.resize({width: parentBox.contentRect.width || '1250px'});// 因为mounted已经拿到父容器设置过了，但是比如父容器设置display:none不显示图形但获取base64导出的时候没有mounted，父容器宽度没有获取到，这里就要在设置一边确认能拿到想要的宽
             }
         },
+        // 会出现在每次数据更新后图形不刷新的问题，是因为echarts给canvas父div一个动态id：charts_instance_，如果id不变化，canvas不刷新，所以每次数据更新都调用一下initchart函数，初始化id，确保图形跟着数据刷新
         initchart () {
             return new Promise( (resolve) => {
                 document.getelementById('heatchart_bar').removeAttribute(' charts_instance_');
