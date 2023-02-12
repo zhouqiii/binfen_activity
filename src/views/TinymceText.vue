@@ -101,8 +101,8 @@ export default {
     },
     addTime() {
       count += 1;
-      // 添加时间-&nbsp解决删除整个时间时总会往前多删一格；加一个空白span解决在插入时间后在插入时间，时间嵌套问题
-      const html = `&nbsp<span id="startDate-${count}" style="z-index: 1">${this.startDate}</span>
+      // 添加时间-加一个空白span解决在插入时间后在插入时间，时间嵌套问题
+      const html = `<span id="startDate-${count}" style="z-index: 1">${this.startDate}</span>
       <span contenteditable='${false}' style="z-index: 99;width: 6px;display: inline-block;margin-left: -4px;height: 20px"></span>`;
       this.$refs.tinymce.addHTML(html);
       this.dialogTime = false;

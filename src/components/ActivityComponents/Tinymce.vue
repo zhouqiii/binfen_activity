@@ -1,6 +1,6 @@
 <template>
   <div class="tinymce_container">
-    <textarea id="tinymceContent" ></textarea>
+    <textarea :id="tinymceId"></textarea>
   </div>
 </template>
 <script>
@@ -42,12 +42,14 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      tinymceId: 'tinymce-id-' + + new Date()
+    };
   },
   methods: {
     initTinymce() {
       tinymce.init({
-        selector: '#tinymceContent',
+        selector: `#${this.tinymceId}`,
         language_url: '/tinymce/zh_CN.js', // 如果这种方式引入错误 可以使用require zh_CN
         language: 'zh_CN',
         readonly: false,
@@ -94,7 +96,7 @@ export default {
       });
     },
     addHTML(html) {
-      const tiny = window.tinymce.get('tinymceContent');
+      const tiny = window.tinymce.get(this.tinymceId);
       const range = tiny.selection.getRng();
       const id = 'id';
       const parentNode = 'parentNode';
@@ -111,11 +113,11 @@ export default {
       range.insertNode(divNode);
     },
     setContent(value) {
-      tinymce.get('tinymceContent').setContent(value);
+      tinymce.get(this.tinymceId).setContent(value);
     },
     destroyTinymce() {
-      if (window.tinymce.get('tinymceContent')) {
-        window.tinymce.get('tinymceContent').destroy();
+      if (window.tinymce.get(this.tinymceId)) {
+        window.tinymce.get(this.tinymceId).destroy();
       }
     },
   },
