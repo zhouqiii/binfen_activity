@@ -55,23 +55,6 @@
       "parser": "babel-eslint"
     },
     "rules": {
-      "no-plusplus": [
-        2,
-        {
-          "allowForLoopAfterthoughts": true
-        }
-      ],
-      "no-restricted-properties": [
-        0,
-        {}
-      ],
-      "prefer-destructuring": [
-        "error",
-        {
-          "object": true,
-          "array": false
-        }
-      ]
     }
   },
   "browserslist": [

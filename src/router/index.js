@@ -29,6 +29,11 @@ const routes = [
     name: 'test-compare',
     component: () => import(/* webpackChunkName: "test" */ '../views/test-compare.vue'),
   },
+  {
+    path: '/drag',
+    name: 'drag',
+    component: () => import(/* webpackChunkName: "test" */ '../views/drag.vue'),
+  },
 ];
 
 const router = new VueRouter({

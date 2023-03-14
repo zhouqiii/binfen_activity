@@ -46,16 +46,16 @@ module.exports = {
       });
   },
   devServer: {
-    proxy: {
-      '/': {
-        target: 'http://22.11.236.69:8080/mlifeWeb/activity',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          '^/': '',
-        },
-      },
-    },
+    // proxy: {
+    //   '/': {
+    //     target: 'http://22.11.236.69:8080/mlifeWeb/activity',
+    //     changeOrigin: true,
+    //     ws: true,
+    //     pathRewrite: {
+    //       '^/': '',
+    //     },
+    //   },
+    // },
     // app是一个express的实例
 
     before(app) {
