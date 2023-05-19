@@ -34,6 +34,11 @@ const routes = [
     name: 'drag',
     component: () => import(/* webpackChunkName: "test" */ '../views/drag.vue'),
   },
+  {
+    path: '/down-ppt',
+    name: 'down-ppt',
+    component: () => import(/* webpackChunkName: "test" */ '../views/downPPT.vue'),
+  },
 ];
 
 const router = new VueRouter({
