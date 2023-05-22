@@ -3,6 +3,7 @@ import ElementUI from 'element-ui';
 import { request } from '@/utils/request';
 import 'element-ui/lib/theme-chalk/index.css';
 import NavBarBase from '@/components/NavBar.vue';
+import * as echarts from 'echarts';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -14,6 +15,7 @@ import '@/assets/icons';
 // 配全局属性配置，在任意组件内可以使用this.$qs获取qs对象
 // Vue.prototype.$qs = qs
 Vue.prototype.request = request;
+Vue.prototype.$echarts = echarts;
 // 引入element
 Vue.use(ElementUI);
 // 组件自己封装的公用组件

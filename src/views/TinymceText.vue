@@ -100,7 +100,7 @@ export default {
       // 在这里定义工具栏添加的自定义按钮的功能
       this.dialogTime = true;
     },
-    addText(){
+    addText() {
       this.$refs.tinymce.addHTML('插入文字', true);
     },
     addTime() {

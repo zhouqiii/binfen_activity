@@ -43,7 +43,7 @@ export default {
   },
   data() {
     return {
-      tinymceId: 'tinymce-id-' + + new Date()
+      tinymceId: `tinymce-id-${+ + new Date()}`,
     };
   },
   methods: {
@@ -55,7 +55,8 @@ export default {
         readonly: false,
         skin_url: '/tinymce/skins/ui/oxide',
         height: this.height,
-        /* tinymce 通过添加扩展插件 plugins 的方式来添加功能 image时上传图片 aoturesize可自动适配高度，有aoturesize时，height失效 link是超链接 配上上面import引入插件 */
+        /* tinymce 通过添加扩展插件 plugins 的方式来添加功能
+        // image时上传图片 aoturesize可自动适配高度，有aoturesize时，height失效 link是超链接 配上上面import引入插件 */
         plugins: 'link lists image code table wordcount template media fullscreen preview paste',
         toolbar: 'bold italic underline strikethrough | fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | undo redo | link unlink image code | removeformat | addToolbar',
         branding: false,
@@ -83,18 +84,18 @@ export default {
             const iframe = document.querySelector('iframe');
             const iframeDoc = iframe.contentWindow.document;
             const addIdFlag = tinymce.activeEditor.selection.getSel().focusNode[parentNode][id];
-            let uselessNode = document.createElement('span')
-            uselessNode.innerHTML = '&nbsp;'
+            const uselessNode = document.createElement('span');
+            uselessNode.innerHTML = '&nbsp;';
             if (addIdFlag) {
               if (addIdFlag.indexOf('startDate') > -1) {
-                if(e.keyCode === 8){//键盘的Back键
+                if (e.keyCode === 8) { //键盘的Back键
                   const get = iframeDoc.getElementById(addIdFlag);
-                  const theParentNode = get.parentNode
-                  theParentNode.insertBefore(uselessNode, get)// &nbsp解决删除整个插入的dom时总会往前删一个字符问题
+                  const theParentNode = get.parentNode;
+                  theParentNode.insertBefore(uselessNode, get); // &nbsp解决删除整个插入的dom时总会往前删一个字符问题
                   if (get) {
                     get.remove();
                     setTimeout(() => {
-                      uselessNode.remove()
+                      uselessNode.remove();
                     }, 100)
                   }
                 }else{//在插入的节点上输入键盘的其他键输入时，不处理
